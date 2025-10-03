@@ -1,7 +1,7 @@
 // components/Navbar.tsx
-'use client';
+"use client";
 
-import { signOut } from 'next-auth/react';
+import { signOut } from "next-auth/react";
 
 interface User {
   name?: string | null;
@@ -26,16 +26,20 @@ const Navbar = ({ user, onLogout }: NavbarProps) => {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-bold text-gray-900">
-                Expense-Manager-Beta
+              Expense-Manager-Beta
             </h1>
             <span className="text-gray-500">|</span>
             <span className="text-gray-600">Expenses Analysis</span>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{user.name}</p>
-              <p className="text-xs text-gray-500">{user.email}</p>
+              <p className="text-sm font-medium text-gray-900">
+                {user?.name ?? "Guest"}
+              </p>
+              <p className="text-xs text-gray-500">
+                {user?.email ?? "Not signed in"}
+              </p>
             </div>
             <button
               onClick={handleLogout}

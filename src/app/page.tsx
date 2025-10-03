@@ -1,8 +1,9 @@
 // app/page.tsx
 "use client";
 
-import { signIn,signOut,useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import SpreadsheetCreator from "@/components/SpreadsheetCreator";
 import ExpensesDashboard from "@/components/ExpensesDashboard";
 import { X } from 'lucide-react';
@@ -16,6 +17,7 @@ interface UserSheet {
 }
 
 export default function Home() {
+  const router = useRouter();
   const { data: session } = useSession();
   const [currentState, setCurrentState] = useState<AppState>('auth');
   const [spreadsheetId, setSpreadsheetId] = useState<string>("");
@@ -140,21 +142,130 @@ export default function Home() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Expense-Manager-Beta
-          </h1>
-          <p className="text-gray-600 mb-6 text-center">
-            Sign in to access your expenses dashboard
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        {/* Header */}
+        <header className="bg-white shadow-sm">
+          <div className="container mx-auto px-4 py-6 flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">Google Sheets Expense Manager</h1>
+            <button
+              onClick={() => signIn("google")}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Sign In
+            </button>
+          </div>
+        </header>
+
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 py-16 text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+            Track Your Expenses with
+            <br />
+            Google Sheets Integration
+          </h2>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            A powerful expense tracking solution that seamlessly syncs with Google Sheets.
+            Keep your finances organized and accessible from anywhere.
           </p>
           <button
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
             onClick={() => signIn("google")}
+            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg inline-flex items-center"
           >
-            Sign in with Google
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+              />
+            </svg>
+            Login with Google
           </button>
-        </div>
+        </section>
+
+        {/* Features Grid */}
+        <section className="container mx-auto px-4 py-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                title: "Easy Expense Tracking",
+                description: "Add, edit, and delete expenses with a user-friendly interface",
+                icon: (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                ),
+              },
+              {
+                title: "Google Sheets Integration",
+                description: "Automatically sync your expenses with Google Sheets",
+                icon: (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                ),
+              },
+              {
+                title: "Smart Search",
+                description: "Quickly find expenses with powerful search capabilities",
+                icon: (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                ),
+              },
+              {
+                title: "Secure Authentication",
+                description: "Safe and secure login with your Google account",
+                icon: (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                ),
+              },
+            ].map((feature, index) => (
+              <div
+                key={index}
+                className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-4">
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* App Preview Section */}
+        <section className="container mx-auto px-4 py-16">
+          <div className="bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4">
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-700 rounded w-5/6"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-white border-t">
+          <div className="container mx-auto px-4 py-8">
+            <p className="text-center text-gray-600">
+              © 2025 Google Sheets Expense Manager. All rights reserved.
+            </p>
+          </div>
+        </footer>
       </div>
     );
   }
