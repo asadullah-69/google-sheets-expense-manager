@@ -23,9 +23,10 @@ async function refreshAccessToken(token: any) {
       throw refreshedTokens;
     }
 
-    const expiresInSec = typeof refreshedTokens.expires_in === "number"
-      ? refreshedTokens.expires_in
-      : parseInt(String(refreshedTokens.expires_in || "0"), 10) || 0;
+    const expiresInSec =
+      typeof refreshedTokens.expires_in === "number"
+        ? refreshedTokens.expires_in
+        : parseInt(String(refreshedTokens.expires_in || "0"), 10) || 0;
 
     return {
       ...token,
@@ -53,13 +54,8 @@ export const authOptions: NextAuthOptions = {
           prompt: "consent",
           access_type: "offline",
           response_type: "code",
-          scope: [
-            "openid",
-            "email",
-            "profile",
-            "https://www.googleapis.com/auth/drive",
-            "https://www.googleapis.com/auth/spreadsheets",
-          ].join(" "),
+          scope:
+            "openid email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
         },
       },
     }),
@@ -67,9 +63,10 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, account, user }) {
       if (account && user) {
-        const expiresInSec = typeof account.expires_in === "number"
-          ? account.expires_in
-          : parseInt(String(account.expires_in || "0"), 10) || 0;
+        const expiresInSec =
+          typeof account.expires_in === "number"
+            ? account.expires_in
+            : parseInt(String(account.expires_in || "0"), 10) || 0;
         return {
           ...token,
           accessToken: account.access_token,
@@ -79,7 +76,11 @@ export const authOptions: NextAuthOptions = {
         };
       }
       const accessTokenExpires = Number((token as any).accessTokenExpires) || 0;
-      if ((token as any).accessToken && accessTokenExpires && Date.now() < accessTokenExpires) {
+      if (
+        (token as any).accessToken &&
+        accessTokenExpires &&
+        Date.now() < accessTokenExpires
+      ) {
         return token;
       }
       return await refreshAccessToken(token);
@@ -101,7 +102,9 @@ export const authOptions: NextAuthOptions = {
           return;
         }
         if (!accessToken) {
-          console.warn("No access token on signIn event; skipping login logging");
+          console.warn(
+            "No access token on signIn event; skipping login logging"
+          );
           return;
         }
         const sheets = getSheets(accessToken);
@@ -111,7 +114,15 @@ export const authOptions: NextAuthOptions = {
           range,
           valueInputOption: "RAW",
           requestBody: {
-            values: [[nowIso, user.email ?? "", user.name ?? "", account?.provider ?? "google", "login"]],
+            values: [
+              [
+                nowIso,
+                user.email ?? "",
+                user.name ?? "",
+                account?.provider ?? "google",
+                "login",
+              ],
+            ],
           },
         });
       } catch (e) {
