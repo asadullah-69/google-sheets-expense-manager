@@ -20,29 +20,31 @@ export default function ExpenseList({ refreshKey }: { refreshKey: number }) {
     setLoading(true);
     setError(null);
 
-    fetch("/api/sheets/read", { 
+    fetch("/api/sheets/read", {
       method: "GET",
-      signal: controller.signal
+      signal: controller.signal,
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch rows");
         return res.json();
       })
       .then((data) => {
-        const parsed: Expense[] = (data.rows || []).map((r: any) => ({
-          date: r[0] || "",
-          description: r[1] || "",
-          category: r[2] || "",
-          amount: parseFloat(r[3]) || 0,
-        }));
+        const parsed: Expense[] = (data.rows || []).map(
+          (r: [string, string, string, string]) => ({
+            date: r[0] || "",
+            description: r[1] || "",
+            category: r[2] || "",
+            amount: parseFloat(r[3]) || 0,
+          })
+        );
         setRows(parsed);
       })
       .catch((err) => {
         // Check if the error was due to timeout/abort
-        if (err.name === 'AbortError') {
-          setError('Request timed out. Please try again.');
+        if (err.name === "AbortError") {
+          setError("Request timed out. Please try again.");
         } else {
-          setError(err.message || 'Error fetching expenses');
+          setError(err.message || "Error fetching expenses");
         }
       })
       .finally(() => setLoading(false));

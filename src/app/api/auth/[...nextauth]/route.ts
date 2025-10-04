@@ -1,35 +1,20 @@
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import { authOptions } from "@/auth";
 
-// Validate required environment variables
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const nextAuthSecret = process.env.NEXTAUTH_SECRET;
 
-if (!googleClientId || !googleClientSecret) {
-  const missingVars = [
-    !googleClientId && "GOOGLE_CLIENT_ID",
-if (
-  !process.env.GOOGLE_CLIENT_ID ||
-  !process.env.GOOGLE_CLIENT_SECRET ||
-  !process.env.NEXTAUTH_SECRET
-) {
-  throw new Error("Missing required authentication environment variables");
-}  ].filter(Boolean);
-  
+if (!googleClientId || !googleClientSecret || !nextAuthSecret) {
+  console.error("Missing required environment variables for authentication:");
+  if (!googleClientId) console.error("→ GOOGLE_CLIENT_ID");
+  if (!googleClientSecret) console.error("→ GOOGLE_CLIENT_SECRET");
+  if (!nextAuthSecret) console.error("→ NEXTAUTH_SECRET");
   throw new Error(
-    `Missing required environment variables: ${missingVars.join(", ")}. ` +
-    "Please check your .env file and make sure these variables are set."
+    "Missing environment variables for Google Auth configuration."
   );
 }
 
-const handler = NextAuth({
-  providers: [
-    GoogleProvider({
-      clientId: googleClientId,
-      clientSecret: googleClientSecret,
-    }),
-  ],
-  secret: process.env.NEXTAUTH_SECRET,
-});
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

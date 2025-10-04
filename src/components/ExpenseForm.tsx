@@ -45,8 +45,12 @@ export default function ExpenseForm({ onAdded }: { onAdded: () => void }) {
       setAmount("");
       setCategory("General");
       onAdded();
-    } catch (err: any) {
-      setError(err.message || "Network error");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Network error");
+      } else {
+        setError("Network error");
+      }
     } finally {
       setLoading(false);
     }
