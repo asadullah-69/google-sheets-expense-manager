@@ -55,33 +55,49 @@ export default function ExpenseForm({ onAdded }: { onAdded: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-sm">
       {error && <div className="text-red-600 mb-2">{error}</div>}
+      {/* Hidden labels for screen readers */}
+      <div className="sr-only">
+        <label htmlFor="expense-description">Expense description</label>
+        <label htmlFor="expense-amount">Amount</label>
+        <label htmlFor="expense-date">Date</label>
+        <label htmlFor="expense-category">Category</label>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
         <input
+          id="expense-description"
           className="border p-2 rounded col-span-2"
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          aria-label="Expense description"
         />
         <input
+          id="expense-amount"
           className="border p-2 rounded"
           placeholder="Amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           inputMode="decimal"
+          aria-label="Amount"
         />
         <input
+          id="expense-date"
           className="border p-2 rounded"
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
+          aria-label="Date"
         />
       </div>
 
       <div className="flex items-center gap-2 mt-2">
         <select
+          id="expense-category"
           className="border p-2 rounded"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          aria-label="Expense category"
         >
           <option>General</option>
           <option>Food</option>

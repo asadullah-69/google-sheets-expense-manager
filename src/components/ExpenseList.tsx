@@ -15,17 +15,20 @@ export default function ExpenseList({ refreshKey }: { refreshKey: number }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     setLoading(true);
     setError(null);
 
-    fetch("/api/sheets/read", { method: "GET" })
+    fetch("/api/sheets/read", { 
+      method: "GET",
+      signal: controller.signal
+    })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch rows");
         return res.json();
       })
       .then((data) => {
-        if (cancelled) return;
         const parsed: Expense[] = (data.rows || []).map((r: any) => ({
           date: r[0] || "",
           description: r[1] || "",
@@ -34,11 +37,19 @@ export default function ExpenseList({ refreshKey }: { refreshKey: number }) {
         }));
         setRows(parsed);
       })
-      .catch((err) => setError(err.message || "Error"))
-      .finally(() => !cancelled && setLoading(false));
+      .catch((err) => {
+        // Check if the error was due to timeout/abort
+        if (err.name === 'AbortError') {
+          setError('Request timed out. Please try again.');
+        } else {
+          setError(err.message || 'Error fetching expenses');
+        }
+      })
+      .finally(() => setLoading(false));
 
     return () => {
-      cancelled = true;
+      clearTimeout(timeoutId);
+      controller.abort();
     };
   }, [refreshKey]);
 
@@ -62,18 +73,21 @@ export default function ExpenseList({ refreshKey }: { refreshKey: number }) {
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={i} className="border-t">
+            <tr
+              key={r.id || `${r.date}-${r.description}-${i}`}
+              className="border-t"
+            >
               <td className="p-2">{r.date}</td>
               <td className="p-2">{r.description}</td>
               <td className="p-2">{r.category}</td>
               <td className="p-2 text-right">${r.amount.toFixed(2)}</td>
             </tr>
-          ))}
+          ))}{" "}
           <tr className="border-t font-semibold">
             <td className="p-2" />
             <td className="p-2">Total</td>
             <td className="p-2" />
-            <td className="p-2 text-right">{total.toFixed(2)}</td>
+            <td className="p-2 text-right">${total.toFixed(2)}</td>
           </tr>
         </tbody>
       </table>

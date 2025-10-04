@@ -12,10 +12,13 @@ export async function POST(req: Request) {
   try {
     const { spreadsheetId, date, description, category, amount } =
       await req.json();
-    if (!spreadsheetId || !description || !amount) {
+    // Validate required fields (allow zero amounts)
+    if (!spreadsheetId || !description || amount == null) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
-
+    if (typeof amount !== "number" || isNaN(amount)) {
+      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+    }
     const sheets = getSheets((session as any).accessToken as string);
 
     const range = "sheet1!A:D"; // Adjust as needed
